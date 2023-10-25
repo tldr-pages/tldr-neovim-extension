@@ -3,11 +3,25 @@ local M = {}
 local repoUrl = "https://github.com/tldr-pages/tldr.git"
 local cacheFolder = os.getenv("HOME") .. "/.cache/tldr.nvim"
 
-function M.download()
-	local gitCloneCommand = "git clone " .. repoUrl .. " " .. cacheFolder
-	local _, exitCode, _ = os.execute(gitCloneCommand)
+local uv = vim.loop
 
-	return exitCode
+function M.download()
+	local gitCloneCommand = "git"
+    local gitCloneArgs = { "clone", repoUrl, cacheFolder }
+
+	local handle, pid = uv.spawn(gitCloneCommand, {
+		args = gitCloneArgs,
+		stdio = { nil, nil, nil },
+	}, function(code, _)
+		if code == 0 then
+			print("TLDR: Successfully downloaded tldr pages")
+		else
+			print("TLDR: Failed to download tldr pages")
+		end
+	end)
+
+	uv.unref(handle)
+	return pid
 end
 
 function M.exists()
@@ -22,10 +36,21 @@ function M.exists()
 end
 
 function M.update()
-	local gitPullCommand = "git -C " .. cacheFolder .. " pull"
-	local _, exitCode, _ = os.execute(gitPullCommand)
+	local gitPullCommand = "git"
+	local gitPullArgs = { "pull" }
 
-	return exitCode
+	local handle, pid = uv.spawn(gitPullCommand, {
+		args = gitPullArgs,
+		cwd = cacheFolder,
+		stdio = { nil, nil, nil },
+	}, function(code, _)
+		if code ~= 0 then
+			print("TLDR: Failed to update tldr pages")
+		end
+	end)
+
+	uv.unref(handle)
+	return pid
 end
 
 local function _clear(dir)
