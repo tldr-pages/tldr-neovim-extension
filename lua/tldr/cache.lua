@@ -1,13 +1,11 @@
+local Config = require("tldr.config")
+
 local M = {}
-
-local repoUrl = "https://github.com/tldr-pages/tldr.git"
-local cacheFolder = os.getenv("HOME") .. "/.cache/tldr.nvim"
-
 local uv = vim.loop
 
 function M.download()
 	local gitCloneCommand = "git"
-    local gitCloneArgs = { "clone", repoUrl, cacheFolder }
+    local gitCloneArgs = { "clone", Config.get("repo_url"), Config.get("cache_dir") }
 
 	local handle, pid = uv.spawn(gitCloneCommand, {
 		args = gitCloneArgs,
@@ -20,12 +18,17 @@ function M.download()
 		end
 	end)
 
+	if handle == nil then
+		print("TLDR: Failed to download tldr pages")
+		return
+	end
+
 	uv.unref(handle)
 	return pid
 end
 
 function M.exists()
-	local f = io.open(cacheFolder .. "/.git/config", "r")
+	local f = io.open(Config.get("cache_dir") .. "/.git/config", "r")
 
 	if f then
 		io.close(f)
@@ -41,13 +44,18 @@ function M.update()
 
 	local handle, pid = uv.spawn(gitPullCommand, {
 		args = gitPullArgs,
-		cwd = cacheFolder,
+		cwd = Config.get("cache_dir"),
 		stdio = { nil, nil, nil },
 	}, function(code, _)
 		if code ~= 0 then
 			print("TLDR: Failed to update tldr pages")
 		end
 	end)
+
+	if handle == nil then
+		print("TLDR: Failed to update tldr pages")
+		return
+	end
 
 	uv.unref(handle)
 	return pid
@@ -76,11 +84,8 @@ local function _clear(dir)
 end
 
 function M.clear()
-	_clear(cacheFolder)
-end
-
-function M.getCacheFolder()
-	return cacheFolder
+	_clear(Config.get("cache_dir"))
 end
 
 return M
+
