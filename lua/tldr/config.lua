@@ -7,11 +7,11 @@ local defaults = {
 	window = {
 		relative = "editor",
 		style = "minimal",
-		width = 40,
-		height = 10,
-		row = 5,
-		col = 5,
-		focusable = false,
+		width = 100,
+		height = 30,
+		row = 3,
+		col = 35,
+		focusable = true,
 		border = "single",
 	}
 }
