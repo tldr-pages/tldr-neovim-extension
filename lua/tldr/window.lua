@@ -13,7 +13,11 @@ function M.new(opts)
 	end
 
 	local bufnr = vim.api.nvim_create_buf(false, true)
-    local winid = vim.api.nvim_open_win(bufnr, true, c)
+	vim.api.nvim_buf_set_option(bufnr, "filetype", "tldr")
+	vim.api.nvim_buf_set_option(bufnr, "buftype", "nofile")
+	vim.api.nvim_buf_set_option(bufnr, "bufhidden", "wipe")
+
+	local winid = vim.api.nvim_open_win(bufnr, true, c)
 
 	if winid == 0 then
 		vim.notify("TLDR: Failed to open window", vim.log.levels.ERROR)
@@ -30,6 +34,11 @@ end
 function M.write(winid, lines)
 	local bufnr = vim.api.nvim_win_get_buf(winid)
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+end
+
+function M.lock_buffer(winid)
+	local bufnr = vim.api.nvim_win_get_buf(winid)
+	vim.api.nvim_buf_set_option(bufnr, "modifiable", false)
 end
 
 function M.close(winid)
