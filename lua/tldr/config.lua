@@ -4,6 +4,7 @@ local defaults = {
 	cache_dir = os.getenv("HOME") .. "/.cache/tldr-nvim",
 	repo_url = "https://github.com/tldr-pages/tldr.git",
 	glow = vim.fn.exepath("glow"),
+	theme = "dark",
 	window = {
 		relative = "editor",
 		style = "minimal",
