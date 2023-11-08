@@ -30,7 +30,7 @@ Once the plugin is installed and set up, you can access TLDR pages from within N
 ```
 :Tldr <topic>: Open a TLDR page for a specific topic.
 :TldrList: List all available TLDR pages. (TODO)
-:TldrUpdate: Update the local TLDR repository to get the latest pages. (TODO, currently auto updates pages in the background)
+:TldrUpdate: Update the local TLDR repository to get the latest pages.
 ```
 
 ## Contributions

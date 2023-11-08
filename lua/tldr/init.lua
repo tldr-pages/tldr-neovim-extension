@@ -3,6 +3,12 @@ local Config = require("tldr.config")
 
 local M = {}
 
+function M.update()
+	vim.notify("Updating TLDR Pages...", vim.log.levels.INFO)
+	Cache.update()
+	vim.notify("TLDR Pages updated", vim.log.levels.INFO)
+end
+
 -- Setup tldr-nvim
 -- @param opts table
 -- @return nil
@@ -21,10 +27,13 @@ function M.setup(opts)
 			vim.notify("TLDR: Failed to download TLDR Pages", vim.log.levels.ERROR)
 		end
 	else
-		Cache.update()
+		if Config.get("auto_update") then
+			Cache.update()
+		end
 	end
 
 	vim.cmd [[ command! -nargs=* Tldr lua require("tldr.tldr").show(<f-args>) ]]
+	vim.cmd [[ command! -nargs=* TldrUpdate lua require("tldr").update() ]]
 end
 
 return M

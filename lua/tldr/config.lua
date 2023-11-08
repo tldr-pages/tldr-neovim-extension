@@ -5,6 +5,7 @@ local defaults = {
 	repo_url = "https://github.com/tldr-pages/tldr.git",
 	glow = vim.fn.exepath("glow"),
 	theme = "dark",
+	auto_update = true,
 	window = {
 		relative = "editor",
 		style = "minimal",

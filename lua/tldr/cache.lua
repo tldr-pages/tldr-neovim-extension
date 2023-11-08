@@ -40,7 +40,7 @@ end
 
 function M.update()
 	local gitPullCommand = "git"
-	local gitPullArgs = { "pull" }
+	local gitPullArgs = { "pull", "--rebase", "origin", "main" }
 
 	local handle, pid = uv.spawn(gitPullCommand, {
 		args = gitPullArgs,
