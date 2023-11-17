@@ -9,6 +9,8 @@ function M.update()
 	vim.notify("TLDR Pages updated", vim.log.levels.INFO)
 end
 
+M.show = require("tldr.tldr").show
+
 -- Setup tldr-nvim
 -- @param opts table
 -- @return nil
@@ -32,7 +34,7 @@ function M.setup(opts)
 		end
 	end
 
-	vim.cmd [[ command! -nargs=* Tldr lua require("tldr.tldr").show(<f-args>) ]]
+	vim.cmd [[ command! -nargs=* Tldr lua require("tldr").show(<f-args>) ]]
 	vim.cmd [[ command! -nargs=* TldrUpdate lua require("tldr").update() ]]
 end
 
