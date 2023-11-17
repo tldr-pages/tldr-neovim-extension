@@ -36,6 +36,11 @@ function M.write(winid, lines)
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
 end
 
+function M.set_keymap(winid, mode, lhs, rhs, opts)
+	local bufnr = vim.api.nvim_win_get_buf(winid)
+	vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts)
+end
+
 function M.lock_buffer(winid)
 	local bufnr = vim.api.nvim_win_get_buf(winid)
 	vim.api.nvim_buf_set_option(bufnr, "modifiable", false)

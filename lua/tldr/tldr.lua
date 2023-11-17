@@ -44,6 +44,8 @@ function M.show(...)
 	end
 
 	local win = Window.new()
+	Window.set_keymap(win, "n", "q", "<cmd>lua require('tldr.window').close(".. win .. ")<cr>", {noremap = true, silent = true})
+	Window.set_keymap(win, "n", "<Esc>", "<cmd>lua require('tldr.window').close(".. win .. ")<cr>", {noremap = true, silent = true})
 
 	-- glow requires a terminal to display renedered text properly
 	term = vim.api.nvim_open_term(vim.api.nvim_win_get_buf(win), {})
