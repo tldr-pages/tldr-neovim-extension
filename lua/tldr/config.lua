@@ -18,6 +18,10 @@ local defaults = {
 	}
 }
 
+if defaults.glow == "" then
+	defaults.glow = os.getenv("HOME") .. "/.local/bin/glow"
+end
+
 -- Get default config
 -- @return table
 function M.getConfig()

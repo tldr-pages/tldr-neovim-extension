@@ -41,14 +41,30 @@ function M.show(...)
 
 	if Glow.isExecutable() then
 		lines = Glow.render(lines)
+	else
+		local input = vim.fn.input("Glow is not installed. Do you want to install it? (y/n): ")
+		if input == "y" then
+			vim.notify("Installing glow...")
+			Glow.install()
+			vim.notify("Glow installed!")
+			return
+		else
+			vim.notify("Glow is required for this plugin to work properly.\nPlease install it from https://github.com/charmbracelet/glow/releases/latest", vim.log.levels.ERROR)
+			return
+		end
 	end
 
 	local win = Window.new()
+	if win == nil then
+		vim.notify("Error: Could not create window", vim.log.levels.ERROR)
+		return
+	end
+
 	Window.set_keymap(win, "n", "q", "<cmd>lua require('tldr.window').close(".. win .. ")<cr>", {noremap = true, silent = true})
 	Window.set_keymap(win, "n", "<Esc>", "<cmd>lua require('tldr.window').close(".. win .. ")<cr>", {noremap = true, silent = true})
 
 	-- glow requires a terminal to display renedered text properly
-	term = vim.api.nvim_open_term(vim.api.nvim_win_get_buf(win), {})
+	local term = vim.api.nvim_open_term(vim.api.nvim_win_get_buf(win), {})
 	vim.api.nvim_chan_send(term, table.concat(lines, "\r\n"))
 end
 
