@@ -7,7 +7,12 @@ TLDR Neovim Extension is a plugin that integrates TLDR pages directly into Neovi
 Add the following line to your Neovim configuration file
 
 ```lua
-use { 'tldr-pages/tldr-neovim-extension' }
+use {
+    'tldr-pages/tldr-neovim-extension',
+    requires = {
+        'nvim-telescope/telescope.nvim'
+    },
+}
 ```
 Save the configuration file and restart Neovim.
 
@@ -29,7 +34,7 @@ Save the configuration file, and the TLDR Neovim Extension will be active the ne
 Once the plugin is installed and set up, you can access TLDR pages from within Neovim. Use the following commands to interact with the plugin:
 ```
 :Tldr <topic>: Open a TLDR page for a specific topic.
-:TldrList: List all available TLDR pages. (TODO)
+:Tldr: List all available TLDR pages in a Telescope window.
 :TldrUpdate: Update the local TLDR repository to get the latest pages.
 ```
 

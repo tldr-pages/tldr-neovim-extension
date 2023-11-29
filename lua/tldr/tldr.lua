@@ -1,8 +1,33 @@
 local Config = require("tldr.config")
 local Window = require("tldr.window")
 local Glow = require("tldr.glow")
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+local conf = require("telescope.config").values
+local finders = require("telescope.finders")
+local pickers = require("telescope.pickers")
 
 local M = {}
+local platforms = {"common", "linux", "windows", "osx", "openbsd", "sunos", "android"}
+
+-- Get all the entries
+-- @return table
+local function get_entries()
+	local entries = {}
+	local dir = Config.get("cache_dir") .. "/pages/"
+
+	for _, platform in ipairs(platforms) do
+		local fullpath = dir .. platform .. "/"
+
+		for _, file in ipairs(vim.fn.readdir(fullpath)) do
+			local name = string.sub(file, 1, -4)
+
+			table.insert(entries, name)
+		end
+	end
+
+	return entries
+end
 
 -- Get the tldr page
 -- @param args string
@@ -13,9 +38,8 @@ local function get_tldr_file(...)
 
 	-- TODO: add support for other languages
 	local parent = Config.get("cache_dir") .. "/pages/"
-	local dirs = {"common", "linux", "windows", "osx", "openbsd", "sunos", "android"}
 
-	for _, value in ipairs(dirs) do
+	for _, value in ipairs(platforms) do
 		local fullpath = parent .. value .. "/" .. filename
 
 		if vim.fn.filereadable(fullpath) == 1 then
@@ -26,8 +50,41 @@ local function get_tldr_file(...)
 	return nil
 end
 
+-- Open telescope to search for a page
+-- @return void
+function M.open_telescope()
+	local entries = get_entries()
+	pickers.new({}, {
+		prompt_title = "TLDR",
+		finder = finders.new_table {
+			results = entries,
+			entry_maker = function(entry)
+				return {
+					value = entry,
+					display = " " .. entry,
+					ordinal = entry,
+				}
+			end,
+		},
+		sorter = conf.generic_sorter({}),
+		attach_mappings = function(prompt_bufnr, map)
+			actions.select_default:replace(function()
+				local selection = action_state.get_selected_entry()
+				actions.close(prompt_bufnr)
+				M.show(selection.value)
+			end)
+
+			return true
+		end,
+	}):find()
+end
 
 function M.show(...)
+	if ... == nil then
+		M.open_telescope()
+		return
+	end
+
 	local filename = get_tldr_file(...)
 	if filename == nil then
 		vim.notify("TLDR: Page not found", vim.log.levels.ERROR)
