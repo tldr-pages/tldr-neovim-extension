@@ -36,8 +36,21 @@ local function get_tldr_file(...)
 	-- concat all arguments with -
 	local filename = table.concat({...}, "-") .. ".md"
 
-	-- TODO: add support for other languages
-	local parent = Config.get("cache_dir") .. "/pages/"
+	local lang = Config.get("preferred_language") or "en"
+	local pages_dir = lang == "en" and "pages" or "pages." .. lang
+
+	local parent = Config.get("cache_dir") .. "/" .. pages_dir .. "/"
+
+	for _, value in ipairs(platforms) do
+		local fullpath = parent .. value .. "/" .. filename
+
+		if vim.fn.filereadable(fullpath) == 1 then
+			return fullpath
+		end
+	end
+
+	pages_dir = "pages"
+	parent = Config.get("cache_dir") .. "/" .. pages_dir .. "/"
 
 	for _, value in ipairs(platforms) do
 		local fullpath = parent .. value .. "/" .. filename

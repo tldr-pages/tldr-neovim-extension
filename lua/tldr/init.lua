@@ -16,7 +16,7 @@ M.show = require("tldr.tldr").show
 -- @return nil
 function M.setup(opts)
 	if opts then
-		vim.tbl_deep_extend("force", Config.getConfig(), opts)
+		Config.merge(opts)
 	end
 
 	if not Cache.exists() then

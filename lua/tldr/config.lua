@@ -6,6 +6,7 @@ local defaults = {
 	glow = vim.fn.exepath("glow"),
 	theme = "dark",
 	auto_update = true,
+	preferred_language = "en",
 	window = {
 		relative = "editor",
 		style = "minimal",
@@ -26,6 +27,10 @@ end
 -- @return table
 function M.getConfig()
 	return defaults
+end
+
+function M.merge(opts)
+	defaults = vim.tbl_deep_extend("force", defaults, opts)
 end
 
 -- Get a config value
