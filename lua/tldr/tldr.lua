@@ -8,7 +8,18 @@ local finders = require("telescope.finders")
 local pickers = require("telescope.pickers")
 
 local M = {}
-local platforms = {"common", "linux", "windows", "osx", "openbsd", "sunos", "android"}
+local platforms = {"common", "linux", "windows", "osx", "sunos", "android", "openbsd", "freebsd", "netbsd"}
+local platform_icons = {
+	android = "",
+	common = "",
+	freebsd = "",
+	linux = "",
+	openbsd = "",
+	netbsd = "󰈾", -- icon don't exist in NerdFonts
+	osx = "",
+	sunos = "",
+	windows = "",
+}
 
 -- Get all the entries
 -- @return table
@@ -21,8 +32,7 @@ local function get_entries()
 
 		for _, file in ipairs(vim.fn.readdir(fullpath)) do
 			local name = string.sub(file, 1, -4)
-
-			table.insert(entries, name)
+			table.insert(entries, {name = name, icon = platform_icons[platform]})
 		end
 	end
 
@@ -67,20 +77,20 @@ end
 -- @return void
 function M.open_telescope()
 	local entries = get_entries()
-	pickers.new({}, {
-		prompt_title = "TLDR",
+	local picker = pickers.new({}, {
+		prompt_title = "TLDR Pages",
 		finder = finders.new_table {
 			results = entries,
 			entry_maker = function(entry)
 				return {
-					value = entry,
-					display = " " .. entry,
-					ordinal = entry,
+					value = entry.name,
+					display = entry.icon .. " " .. entry.name,
+					ordinal = entry.name,
 				}
 			end,
 		},
 		sorter = conf.generic_sorter({}),
-		attach_mappings = function(prompt_bufnr, map)
+		attach_mappings = function(prompt_bufnr, _)
 			actions.select_default:replace(function()
 				local selection = action_state.get_selected_entry()
 				actions.close(prompt_bufnr)
