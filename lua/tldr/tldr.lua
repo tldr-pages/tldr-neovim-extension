@@ -77,14 +77,21 @@ end
 -- @return void
 function M.open_telescope()
 	local entries = get_entries()
+	
+	if #entries == 0 then
+		vim.notify("❌ No TLDR pages found. Please run :TldrUpdate to download them.", vim.log.levels.ERROR)
+		return
+	end
+	
 	local picker = pickers.new({}, {
-		prompt_title = "TLDR Pages",
+		prompt_title = "📚 TLDR Pages (" .. #entries .. " available)",
+		results_title = "Commands",
 		finder = finders.new_table {
 			results = entries,
 			entry_maker = function(entry)
 				return {
 					value = entry.name,
-					display = entry.icon .. " " .. entry.name,
+					display = entry.icon .. "  " .. entry.name,
 					ordinal = entry.name,
 				}
 			end,
@@ -94,6 +101,7 @@ function M.open_telescope()
 			actions.select_default:replace(function()
 				local selection = action_state.get_selected_entry()
 				actions.close(prompt_bufnr)
+				vim.notify("📖 Opening TLDR page for: " .. selection.value, vim.log.levels.INFO)
 				M.show(selection.value)
 			end)
 
@@ -110,7 +118,9 @@ function M.show(...)
 
 	local filename = get_tldr_file(...)
 	if filename == nil then
-		vim.notify("TLDR: Page not found", vim.log.levels.ERROR)
+		local search_term = table.concat({...}, "-")
+		vim.notify("❌ TLDR page not found for: '" .. search_term .. "'", vim.log.levels.ERROR)
+		vim.notify("💡 Try ':Tldr' without arguments to browse available pages", vim.log.levels.INFO)
 		return
 	end
 
@@ -122,15 +132,23 @@ function M.show(...)
 	if Glow.isExecutable() then
 		lines = Glow.render(lines)
 	else
-		local input = vim.fn.input("Glow is not installed. Do you want to install it? (y/n): ")
-		if input == "y" then
-			vim.notify("Installing glow...")
+		vim.notify("⚠️  Glow renderer not found", vim.log.levels.WARN)
+		local input = vim.fn.input({
+			prompt = "📦 Install glow for better rendering? [Y/n]: "
+		})
+		
+		if input:lower() == "y" or input:lower() == "yes" or input == "" then
+			vim.notify("🔄 Installing glow...", vim.log.levels.INFO)
 			Glow.install()
-			vim.notify("Glow installed!")
-			return
+			-- Check if installation was successful
+			if Glow.isExecutable() then
+				vim.notify("✅ Glow installed successfully! Rendering page...", vim.log.levels.INFO)
+				lines = Glow.render(lines)
+			else
+				vim.notify("❌ Glow installation may have failed. Displaying plain text.", vim.log.levels.WARN)
+			end
 		else
-			vim.notify("Glow is required for this plugin to work properly.\nPlease install it from https://github.com/charmbracelet/glow/releases/latest", vim.log.levels.ERROR)
-			return
+			vim.notify("📝 Displaying plain text (install glow for better rendering)", vim.log.levels.INFO)
 		end
 	end
 
