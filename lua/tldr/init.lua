@@ -4,9 +4,8 @@ local Config = require("tldr.config")
 local M = {}
 
 function M.update()
-	vim.notify("Updating TLDR Pages...", vim.log.levels.INFO)
+	vim.notify("🔄 Updating TLDR pages in the background...", vim.log.levels.INFO)
 	Cache.update()
-	vim.notify("TLDR Pages updated", vim.log.levels.INFO)
 end
 
 M.show = require("tldr.tldr").show
@@ -20,13 +19,15 @@ function M.setup(opts)
 	end
 
 	if not Cache.exists() then
-		local answer = vim.fn.input("TLDR Pages not found. Do you want to download them? (Y/n)")
+		local answer = vim.fn.input({
+			prompt = "📥 TLDR pages not found. Download them now? [Y/n]: ",
+		})
 
-		if answer == "Y" or answer == "y" or answer == "" then
-			vim.notify("Downloading TLDR Pages...", vim.log.levels.INFO)
+		if answer:lower() == "y" or answer:lower() == "yes" or answer == "" then
+			vim.notify("📥 Downloading TLDR pages in the background...", vim.log.levels.INFO)
 			Cache.download()
 		else
-			vim.notify("TLDR: Failed to download TLDR Pages", vim.log.levels.ERROR)
+			vim.notify("❌ TLDR: Cannot function without TLDR pages.", vim.log.levels.WARN)
 		end
 	else
 		if Config.get("auto_update") then
